@@ -10,6 +10,7 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
 
-int configurator_open(unsigned int adcNumber);
+int configurator_open(unsigned int adcNumber, unsigned int bufferLength);
+int configurator_close(unsigned int adcNumber);
 
 #endif
