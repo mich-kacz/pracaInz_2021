@@ -29,6 +29,7 @@
 #define BBB_adc6_raw      "/sys/bus/iio/devices/iio:device0/in_voltage6_raw"
 #define BBB_buffer_length "/sys/bus/iio/devices/iio:device0/buffer/length"
 #define BBB_buffer_enable "/sys/bus/iio/devices/iio:device0/buffer/enable"
+#define BBB_buffer_available "/sys/bus/iio/devices/iio:device0/buffer/data_available"
 #define BBB_buffer_data   "/dev/iio:device0"
 
 #endif
