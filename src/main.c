@@ -2,7 +2,7 @@
 /* Constants and macros --------------------------------------------------------------- */
 
 #define ADC_PORT      0
-#define BUFFER_LENGTH 2048
+#define BUFFER_LENGTH 64
 
 /* Includes --------------------------------------------------------------- */
 #include <signal.h>
@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include "configurator.h"
+#include "acquisitor.h"
 
 
 /* Interrupt handler ------------------------------------------------------- */
@@ -24,6 +25,7 @@ void interruptHandler(int signal)
 {
     interrupt = true;
 }
+
 
 /* Main --------------------------------------------------------------- */
 
@@ -42,8 +44,13 @@ int main(void)
 
     while (interrupt == false)
     {
+
         sleep(0.1);
     }
+
+    char buffer[BUFFER_LENGTH]={0};
+    acquisitor_acquire(buffer, BUFFER_LENGTH);
+    printf("BUFFER: %s\n", buffer);
 
     error = configurator_close(ADC_PORT);
     if (error != 0)

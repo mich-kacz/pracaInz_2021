@@ -12,6 +12,6 @@
 
 /* Exposed API --------------------------------------------------------------- */
 
-void acquisitor_acquire(void);
+void acquisitor_acquire(char* buffer, unsigned int size);
 
 #endif
