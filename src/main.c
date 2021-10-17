@@ -42,15 +42,19 @@ int main(void)
         printf("ERROR: %s", strerror(error));
     }
 
+    char buffer[BUFFER_LENGTH]={0};
     while (interrupt == false)
     {
 
         sleep(0.1);
+    	acquisitor_acquire(buffer, BUFFER_LENGTH);
+	printf("BUFFER: %s\n", buffer);
+	memset(buffer, 0, BUFFER_LENGTH);
     }
 
-    char buffer[BUFFER_LENGTH]={0};
-    acquisitor_acquire(buffer, BUFFER_LENGTH);
-    printf("BUFFER: %s\n", buffer);
+    //char buffer[BUFFER_LENGTH]={0};
+    //acquisitor_acquire(buffer, BUFFER_LENGTH);
+    //printf("BUFFER: %s\n", buffer);
 
     error = configurator_close(ADC_PORT);
     if (error != 0)

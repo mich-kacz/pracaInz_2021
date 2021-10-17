@@ -64,6 +64,7 @@ static int configurator_disableScan(char* path)
     {
         fprintf(file, "%d", 0);
         fclose(file);
+	printf("%s\n", path);
     }
 
     return ret;
@@ -81,26 +82,27 @@ static int configurator_getPath(char* path, unsigned int size, unsigned int adcN
     switch (adcNumber)
     {
         case 0:
-            strcpy(path, "/home/michal/Pulpit/pracaInz_2021/test_en_scan.txt");
+	    //strcpy(path, "/home/michal/Pulpit/pracaInz_2021/test_en_scan.txt");
+            strncpy(path, BBB_adc0_enable, size);
             break;
-            /*case 1:
-                strncpy(path, BBB_adc1_enable, size);
-                break;
-            case 2:
-                strncpy(path, BBB_adc2_enable, size);
-                break;
-            case 3:
-                strncpy(path, BBB_adc3_enable, size);
-                break;
-            case 4:
-                strncpy(path, BBB_adc4_enable, size);
-                break;
-            case 5:
-                strncpy(path, BBB_adc5_enable, size);
-                break;
-            case 6:
-                strncpy(path, BBB_adc6_enable, size);
-                break;*/
+        case 1:
+            strncpy(path, BBB_adc1_enable, size);
+            break;
+        case 2:
+            strncpy(path, BBB_adc2_enable, size);
+            break;
+        case 3:
+            strncpy(path, BBB_adc3_enable, size);
+            break;
+        case 4:
+            strncpy(path, BBB_adc4_enable, size);
+            break;
+        case 5:
+            strncpy(path, BBB_adc5_enable, size);
+            break;
+        case 6:
+            strncpy(path, BBB_adc6_enable, size);
+            break;
 
         default:
             ret = EINVAL;
@@ -115,8 +117,8 @@ static int configurator_setBufferLength(unsigned int bufferLength)
     FILE* file;
     int ret = 0;
 
-    // file=fopen(BBB_buffer_length, 'w');
-    file = fopen("/home/michal/Pulpit/pracaInz_2021/test_buff_length.txt", "w");
+    file=fopen(BBB_buffer_length, "w");
+    //file = fopen("/home/michal/Pulpit/pracaInz_2021/test_buff_length.txt", "w");
 
     if (file == NULL)
     {
@@ -137,8 +139,8 @@ static int configurator_enableBuffer()
     FILE* file;
     int ret = 0;
 
-    // file=fopen(BBB_buffer_length, 'w');
-    file = fopen("/home/michal/Pulpit/pracaInz_2021/test_buff_en.txt", "w");
+    file=fopen(BBB_buffer_enable, "w");
+    //file = fopen("/home/michal/Pulpit/pracaInz_2021/test_buff_en.txt", "w");
 
     if (file == NULL)
     {
@@ -159,8 +161,8 @@ static int configurator_disableBuffer()
     FILE* file;
     int ret = 0;
 
-    // file=fopen(BBB_buffer_length, 'w');
-    file = fopen("/home/michal/Pulpit/pracaInz_2021/test_buff_en.txt", "w");
+    file=fopen(BBB_buffer_enable, "w");
+    //file = fopen("/home/michal/Pulpit/pracaInz_2021/test_buff_en.txt", "w");
 
     if (file == NULL)
     {
@@ -180,7 +182,7 @@ static int configurator_disableBuffer()
 
 int configurator_open(unsigned int adcNumber, unsigned int bufferLength)
 {
-    char path[64];
+    char path[64]={0};
     int ret = 0;
 
     ret = configurator_getPath(path, 64, adcNumber);
@@ -206,7 +208,7 @@ int configurator_open(unsigned int adcNumber, unsigned int bufferLength)
 
 int configurator_close(unsigned int adcNumber)
 {
-    char path[64];
+    char path[64]={0};
     int ret = 0;
 
     ret = configurator_getPath(path, 64, adcNumber);

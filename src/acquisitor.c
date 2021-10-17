@@ -39,6 +39,7 @@ static long acquisitor_getInfo(FILE* File)
     char textOutput[7] = {0};
 
     acquisitor_read(File, textOutput, 7);
+    //fread(textOutput, 1, 7, File);
 
     long bufferLength;
 
