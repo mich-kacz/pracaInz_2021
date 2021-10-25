@@ -7,11 +7,13 @@
  ******************************************************************************
  */
 
+ #include <stdint.h>
+
 #ifndef ACQUISITOR_H
 #define ACQUISITOR_H
 
 /* Exposed API --------------------------------------------------------------- */
 
-void acquisitor_acquire(char* buffer, unsigned int size);
+void acquisitor_acquire(uint16_t* buffer, unsigned int size);
 
 #endif

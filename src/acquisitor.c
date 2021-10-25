@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #include "BeagleBoneBlack.h"
 
 /* Private Variables --------------------------------------------------------------- */
@@ -30,7 +31,7 @@ typedef struct Acquisitor_Files_Info_s
 
 static Acquisitor_Files_Info_t acquisitor_openFile(Acquisitor_Files_Info_t data);
 static void acquisitor_closeFile(FILE* File);
-static void acquisitor_read(FILE* File, char* buffer, unsigned int size);
+static void acquisitor_read(FILE* File, uint16_t* buffer, unsigned int size);
 static long acquisitor_getInfo(FILE* File);
 
 static long acquisitor_getInfo(FILE* File)
@@ -38,29 +39,27 @@ static long acquisitor_getInfo(FILE* File)
 
     char textOutput[7] = {0};
 
-    acquisitor_read(File, textOutput, 7);
-    //fread(textOutput, 1, 7, File);
+    //acquisitor_read(File, textOutput, 7);
+    fread(textOutput, 1, 7, File);
 
     long bufferLength;
 
     bufferLength = atol(textOutput);
-
-    //printf("NUMBER: %ld\n", bufferLength);
 
     return bufferLength;
 }
 
 static Acquisitor_Files_Info_t acquisitor_openFile(Acquisitor_Files_Info_t data)
 {
-    FILE* infoFIle = fopen(BBB_buffer_available, "rb");
-    //FILE* infoFIle = fopen("/home/michal/Pulpit/pracaInz_2021/src/length.txt", "rb");
-
+    FILE* infoFIle = fopen(BBB_buffer_available, "r");
+    //FILE* infoFIle = fopen(BBB_adc0_raw, "r");
+    
     data.bufferLength = acquisitor_getInfo(infoFIle);
 
     fclose(infoFIle);
 
-    data.File = fopen(BBB_buffer_data, "rb");
-    //data.File = fopen("/home/michal/Pulpit/pracaInz_2021/test_buff_data.txt", "rb");
+    data.File = fopen(BBB_buffer_data, "r");
+    //data.File = fopen(BBB_adc0_raw, "r");
    
     return data;
 }
@@ -71,15 +70,16 @@ static void acquisitor_closeFile(FILE* File)
     fclose(File);
 }
 
-void acquisitor_read(FILE* File, char* buffer, unsigned int size)
+void acquisitor_read(FILE* File, uint16_t* buffer, unsigned int size)
 {
-        fread(buffer, 1, size, File);
-        //printf("STRING: %s\n", buffer);
+        //fread(buffer, 4, size, File);
+        
+        printf("Odczytalem: %d\n", fread(buffer, 2, size, File));
 }
 
 /* Exposed API --------------------------------------------------------------- */
 
-void acquisitor_acquire(char* buffer, unsigned int size)
+void acquisitor_acquire(uint16_t* buffer, unsigned int size)
 {
     Acquisitor_Files_Info_t data;
 

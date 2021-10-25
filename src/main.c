@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "configurator.h"
 #include "acquisitor.h"
@@ -42,19 +43,18 @@ int main(void)
         printf("ERROR: %s", strerror(error));
     }
 
-    char buffer[BUFFER_LENGTH]={0};
+    uint16_t buffer[BUFFER_LENGTH]={0};
+   
     while (interrupt == false)
     {
 
-        sleep(0.1);
+        sleep(1);
     	acquisitor_acquire(buffer, BUFFER_LENGTH);
-	printf("BUFFER: %s\n", buffer);
-	memset(buffer, 0, BUFFER_LENGTH);
+        printf("%u\n", buffer[0]);
+	    memset(buffer, 0, BUFFER_LENGTH*sizeof(uint16_t));
+        
     }
 
-    //char buffer[BUFFER_LENGTH]={0};
-    //acquisitor_acquire(buffer, BUFFER_LENGTH);
-    //printf("BUFFER: %s\n", buffer);
 
     error = configurator_close(ADC_PORT);
     if (error != 0)
