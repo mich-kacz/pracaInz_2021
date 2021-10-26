@@ -5,4 +5,4 @@ file(GLOB serial_src
 
 project(serial_project)
 add_compile_options(-Wall -Wpedantic -Werror)
-add_executable(serial ${serial_src})
+add_executable(Acquisitor ${serial_src})

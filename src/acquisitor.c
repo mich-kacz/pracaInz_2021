@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 #include "BeagleBoneBlack.h"
@@ -31,20 +32,21 @@ typedef struct Acquisitor_Files_Info_s
 
 static Acquisitor_Files_Info_t acquisitor_openFile(Acquisitor_Files_Info_t data);
 static void acquisitor_closeFile(FILE* File);
-static void acquisitor_read(FILE* File, uint16_t* buffer, unsigned int size);
-static long acquisitor_getInfo(FILE* File);
+static int acquisitor_read(FILE* File, uint16_t* buffer, Acquisitor_Files_Info_t data);
+static int acquisitor_getInfo(FILE* File);
 
-static long acquisitor_getInfo(FILE* File)
+static int acquisitor_getInfo(FILE* File)
 {
 
     char textOutput[7] = {0};
 
-    //acquisitor_read(File, textOutput, 7);
     fread(textOutput, 1, 7, File);
 
-    long bufferLength;
+    int bufferLength;
 
-    bufferLength = atol(textOutput);
+    bufferLength = atoi(textOutput);
+
+    //printf("Data in buffer: %d\n", bufferLength);
 
     return bufferLength;
 }
@@ -70,22 +72,27 @@ static void acquisitor_closeFile(FILE* File)
     fclose(File);
 }
 
-void acquisitor_read(FILE* File, uint16_t* buffer, unsigned int size)
-{
-        //fread(buffer, 4, size, File);
-        
-        printf("Odczytalem: %d\n", fread(buffer, 2, size, File));
+int acquisitor_read(FILE* File, uint16_t* buffer, Acquisitor_Files_Info_t data)
+{  
+        return fread(buffer, 2, data.bufferLength, File);
 }
 
 /* Exposed API --------------------------------------------------------------- */
 
-void acquisitor_acquire(uint16_t* buffer, unsigned int size)
+int acquisitor_acquire(uint16_t* buffer, unsigned int size)
 {
     Acquisitor_Files_Info_t data;
 
     data=acquisitor_openFile(data);
 
-    acquisitor_read(data.File, buffer, size);
+    if(data.bufferLength>0)
+    {
+        memset(buffer, 0, size*sizeof(uint16_t));
+    }
+
+    int ret = acquisitor_read(data.File, buffer, data);
 
     acquisitor_closeFile(data.File);
+
+    return ret;
 }

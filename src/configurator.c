@@ -64,7 +64,6 @@ static int configurator_disableScan(char* path)
     {
         fprintf(file, "%d", 0);
         fclose(file);
-	printf("%s\n", path);
     }
 
     return ret;
@@ -215,12 +214,12 @@ int configurator_close(unsigned int adcNumber)
 
     if (ret == 0)
     {
-        ret = configurator_disableScan(path);
+        ret = configurator_disableBuffer();
     }
 
     if (ret == 0)
     {
-        ret = configurator_disableBuffer();
+        ret = configurator_disableScan(path);
     }
 
     return ret;

@@ -14,6 +14,6 @@
 
 /* Exposed API --------------------------------------------------------------- */
 
-void acquisitor_acquire(uint16_t* buffer, unsigned int size);
+int acquisitor_acquire(uint16_t* buffer, unsigned int size);
 
 #endif
