@@ -10,6 +10,8 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
 
+/* Exposed API --------------------------------------------------------------- */
+
 int configurator_open(unsigned int adcNumber, unsigned int bufferLength);
 int configurator_close(unsigned int adcNumber);
 
