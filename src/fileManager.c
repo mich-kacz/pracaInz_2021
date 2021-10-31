@@ -38,30 +38,40 @@ static char* fileManager_getPath(char *const path, bool raw);
 static void fileManager_getData(fileManager_Data_t* container, char* path);
 static void fileManager_setFileSize(fileManager_Data_t* container,  char* path);
 
-static void fileManager_setFileSize(fileManager_Data_t* container, char* path)
+static void fileManager_setFileSize(fileManager_Data_t* const container, char* const path)
 {
     long position = 0;
+    char str[8] = {0};
 
     FILE* file;
-    file = fopen(path, "a");
+    file = fopen(path, "r");
 
-    fseek(file, 0, SEEK_END);
-    position = ftell(file);
-    rewind(file);
+    while(fgets(str, 8, file)!=NULL)
+    {
+        position += 1;
+    }
 
     container->size = position;
 
     fclose(file);
 }
 
-static void fileManager_getData(fileManager_Data_t* container, char* path)
+static void fileManager_getData(fileManager_Data_t* const container, char* const path)  //Dokonczyc
 {
+    char str[8] = {0};
+    long position = 0;
+
     fileManager_setFileSize(container, path);
+    container->data = malloc(sizeof(uint16_t)*container->size);
 
     FILE* file;
-    file = fopen(path, "a");
-
-    printf("My data length: %u\n", container->size);
+    file = fopen(path, "r");
+    rewind(file);
+    while(fgets(str, 8, file)!=NULL)
+    {
+        sscanf(str, "%hu", &container->data[position]);
+        position += 1;
+    }
 
     fclose(file);
 }
@@ -120,7 +130,7 @@ static char* fileManager_getPath(char *const path,  bool raw)
     return 0;
  }
 
- int fileManager_convertToVoltage(void)
+ int fileManager_convertToVoltage(void) //Dokonczyc
  {
     char path[FILE_NAME_LEN] = {0};
     fileManager_getPath(path, true);
@@ -129,6 +139,22 @@ static char* fileManager_getPath(char *const path,  bool raw)
 
     fileManager_getData(&container, path);
 
+    memset(path, 0, FILE_NAME_LEN);
+    fileManager_getPath(path, false);
+
+    long i = 0;
+    float temp = 0;
+    FILE* file;
+    file = fopen(path, "a");
+
+    for (i=0;i<container.size;i++)
+    {
+        temp = container.data[i] * 1.8/4096;
+        fprintf(file,"%f\n" ,temp);
+    }
+
+    free(container.data);
+    fclose(file);
 
     return 0;
  }
