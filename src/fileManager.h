@@ -18,6 +18,6 @@
 
 int fileManager_saveRawData(uint16_t *buffer, unsigned int size);
 int fileManager_prepareNewFile(void);
-int fileManager_convertToVoltage(void);
+int fileManager_saveAsVoltage(void);
 
  #endif

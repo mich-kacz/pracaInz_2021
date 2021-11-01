@@ -179,12 +179,19 @@ static int configurator_disableBuffer()
 
 /* Exposed API ------------------------------------------------------- */
 
-int configurator_open(unsigned int adcNumber, unsigned int bufferLength)
+int configurator_open(unsigned int adcNumber, unsigned int adcNumber2, unsigned int bufferLength)
 {
     char path[64]={0};
     int ret = 0;
 
     ret = configurator_getPath(path, 64, adcNumber);
+
+    if (ret == 0)
+    {
+        ret = configurator_enableScan(path);
+    }
+    memset(path, 0, 64);
+    ret = configurator_getPath(path, 64, adcNumber2);
 
     if (ret == 0)
     {
@@ -205,22 +212,26 @@ int configurator_open(unsigned int adcNumber, unsigned int bufferLength)
 }
 
 
-int configurator_close(unsigned int adcNumber)
+int configurator_close(unsigned int adcNumber, unsigned int adcNumber2)
 {
     char path[64]={0};
     int ret = 0;
-
-    ret = configurator_getPath(path, 64, adcNumber);
 
     if (ret == 0)
     {
         ret = configurator_disableBuffer();
     }
 
+    ret = configurator_getPath(path, 64, adcNumber);
     if (ret == 0)
     {
         ret = configurator_disableScan(path);
     }
-
+    memset(path, 0, 64);
+    ret = configurator_getPath(path, 64, adcNumber2);
+    if (ret == 0)
+    {
+        ret = configurator_disableScan(path);
+    }
     return ret;
 }

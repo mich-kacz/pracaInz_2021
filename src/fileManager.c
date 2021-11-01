@@ -34,9 +34,10 @@ typedef struct fileManager_Data_s
 
 
  /* Private Functions --------------------------------------------------------------- */
-static char* fileManager_getPath(char *const path, bool raw);
-static void fileManager_getData(fileManager_Data_t* container, char* path);
+static char* fileManager_getPath(char *const path, bool raw, bool channel);
+static void fileManager_getData(fileManager_Data_t* container, char* path, bool channel);
 static void fileManager_setFileSize(fileManager_Data_t* container,  char* path);
+static void fileManager_convertToVoltage(fileManager_Data_t* container,  char* path);
 
 static void fileManager_setFileSize(fileManager_Data_t* const container, char* const path)
 {
@@ -51,15 +52,15 @@ static void fileManager_setFileSize(fileManager_Data_t* const container, char* c
         position += 1;
     }
 
-    container->size = position;
+    container->size = position/2;
 
     fclose(file);
 }
 
-static void fileManager_getData(fileManager_Data_t* const container, char* const path)  //Dokonczyc
+static void fileManager_getData(fileManager_Data_t* const container, char* const path, bool channel)
 {
     char str[8] = {0};
-    long position = 0;
+    long position = 0, pointer = 0;
 
     fileManager_setFileSize(container, path);
     container->data = malloc(sizeof(uint16_t)*container->size);
@@ -69,14 +70,22 @@ static void fileManager_getData(fileManager_Data_t* const container, char* const
     rewind(file);
     while(fgets(str, 8, file)!=NULL)
     {
-        sscanf(str, "%hu", &container->data[position]);
+        if(channel == false && position%2 == 0)
+        {
+            sscanf(str, "%hu", &container->data[pointer]);
+            pointer += 1;
+        }else if(channel == true && position%2 == 1)
+        {
+            sscanf(str, "%hu", &container->data[pointer]);
+            pointer += 1;
+        }
         position += 1;
     }
 
     fclose(file);
 }
 
-static char* fileManager_getPath(char *const path,  bool raw)
+static char* fileManager_getPath(char *const path,  bool raw, bool channel)
 {
     char buff[7]={0};
 
@@ -90,6 +99,15 @@ static char* fileManager_getPath(char *const path,  bool raw)
 
     sprintf(buff,"%u" ,fileNumber);
     strcpy(path, strcat(path, buff));
+
+    if (channel == true && raw == false)
+    {
+        strcpy(path, strcat(path, "_ch2"));
+    }else if(channel == false && raw == false)
+    {
+        strcpy(path, strcat(path, "_ch1"));
+    }
+
     strcpy(path, strcat(path, ".txt"));
 
     return path;
@@ -101,7 +119,7 @@ static char* fileManager_getPath(char *const path,  bool raw)
  int fileManager_saveRawData(uint16_t *buffer, unsigned int size)
  {
     char path[FILE_NAME_LEN] = {0};
-    fileManager_getPath(path, true);
+    fileManager_getPath(path, true, false);
     FILE* file;
     file = fopen(path, "a");
     
@@ -116,45 +134,67 @@ static char* fileManager_getPath(char *const path,  bool raw)
 
  int fileManager_prepareNewFile(void)
  {
+    int error = 0;
     char path[FILE_NAME_LEN] = {0};
     
     fileNumber = 1;
-    system("sudo mount /dev/sda1 /media/usb/");
-    fileManager_getPath(path, true);
+    error = system("sudo mount /dev/sda1 /media/usb/");
+    if (error != 0)
+    {
+        error = system("sudo mount /dev/sdb1 /media/usb/");
+    }
+    fileManager_getPath(path, true, false);
     
     while(access(path, F_OK)==0)
     {
         fileNumber++;
-        fileManager_getPath(path, true);
+        fileManager_getPath(path, true, false);
     }
     return 0;
  }
 
- int fileManager_convertToVoltage(void) //Dokonczyc
- {
-    char path[FILE_NAME_LEN] = {0};
-    fileManager_getPath(path, true);
 
-    fileManager_Data_t container;
 
-    fileManager_getData(&container, path);
-
-    memset(path, 0, FILE_NAME_LEN);
-    fileManager_getPath(path, false);
-
+static void fileManager_convertToVoltage(fileManager_Data_t* const container, char* const path)
+{
     long i = 0;
     float temp = 0;
     FILE* file;
     file = fopen(path, "a");
 
-    for (i=0;i<container.size;i++)
+    for (i=0;i<container->size;i++)
     {
-        temp = container.data[i] * 1.8/4096;
+        temp = container->data[i] * 1.8/4096;
         fprintf(file,"%f\n" ,temp);
     }
 
-    free(container.data);
+    free(container->data);
     fclose(file);
+}
+
+
+
+ int fileManager_saveAsVoltage(void) 
+ {
+    char path[FILE_NAME_LEN] = {0};
+    fileManager_Data_t container;
+
+    fileManager_getPath(path, true, false);
+    fileManager_getData(&container, path, false);
+
+    memset(path, 0, FILE_NAME_LEN);
+    fileManager_getPath(path, false, false);
+
+    fileManager_convertToVoltage(&container, path);
+
+
+    fileManager_getPath(path, true, false);
+    fileManager_getData(&container, path, true);
+
+    memset(path, 0, FILE_NAME_LEN);
+    fileManager_getPath(path, false, true);
+
+    fileManager_convertToVoltage(&container, path);
 
     return 0;
  }

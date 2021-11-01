@@ -12,7 +12,7 @@
 
 /* Exposed API --------------------------------------------------------------- */
 
-int configurator_open(unsigned int adcNumber, unsigned int bufferLength);
-int configurator_close(unsigned int adcNumber);
+int configurator_open(unsigned int adcNumber, unsigned int adcNumber2, unsigned int bufferLength);
+int configurator_close(unsigned int adcNumber, unsigned int adcNumber2);
 
 #endif
