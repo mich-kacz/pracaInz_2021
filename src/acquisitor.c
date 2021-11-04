@@ -46,7 +46,6 @@ static int acquisitor_getInfo(FILE* File)
 
     bufferLength = atoi(textOutput);
 
-    //printf("Data in buffer: %d\n", bufferLength);
 
     return bufferLength;
 }
