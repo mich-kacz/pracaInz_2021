@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "BeagleBoneBlack.h"
+#include "fileManager/BeagleBoneBlack.h"
 
 
 /* Private functions ------------------------------------------------------- */
