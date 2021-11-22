@@ -32,6 +32,7 @@ static unsigned int cicFilter_decimator(double *data, unsigned int R, unsigned i
 static void cicFilter_comb(double *data, unsigned int N, unsigned int M, unsigned int size);
 static void cicFilter_scale(double *data, unsigned int R, unsigned int N, unsigned int M, unsigned int size);
 static unsigned int cicFilter_allStages(double *data, unsigned int R, unsigned int N, unsigned int M, unsigned int len);
+static void cicFilter_saveToFile(FILE* file, double* data, unsigned int size);
 
 
  static void cicFilter_createFiles(char* path, unsigned int channel)
@@ -45,22 +46,15 @@ static unsigned int cicFilter_allStages(double *data, unsigned int R, unsigned i
 
 static void cicFilter_loadData(FILE* file, double* data, unsigned int endPoint, unsigned int startPoint)
 {
-    char buff[16];
-    unsigned long position = 1;
-    
-    while(position<startPoint)
-    {
-        fgets(buff, 16, file);
-        position += 1;
-    }
-    position = 0;
+    char buff[32] = {0};
+    unsigned long position = 0;
     unsigned int i=0;
-    memset(buff, 0, 16);
+    
     for(i=startPoint; i<=endPoint; i++)
     {
-        fgets(buff, 16, file);
+        fgets(buff, 32, file);
         sscanf(buff, "%lf", &data[position]);
-        memset(buff, 0, 16);
+        memset(buff, 0, 32);
         position++;
     }
 
@@ -145,21 +139,39 @@ static void cicFilter_scale(double *data, unsigned int R, unsigned int N, unsign
 static unsigned int cicFilter_allStages(double *data, unsigned int R, unsigned int N, unsigned int M, unsigned int len)
 {
     cicFilter_integrator(data, N, len);
-
-    unsigned int i=0, size = 0;
+    
+    unsigned int size = 0;
     size = cicFilter_decimator(data, R, len);
 
     cicFilter_comb(data, N, M, size);
 
     cicFilter_scale(data, R, N, M, size);
 
-    printf("\n");
-    for(i=0;i<size;i++)
-    {
-        printf("%lf\n", data[i]);
-    }
-
     return size;
+}
+
+static void cicFilter_saveToFile(FILE* file, double* data, unsigned int size)
+{
+    unsigned int i = 0;
+    
+    for (i=0;i<size;i++)
+    {
+        if(i>6)
+        fprintf(file,"%lf\n" ,data[i]);
+    }
+}
+
+static unsigned int cicFilter_getNumberOfElements(FILE* file)
+{
+    char str[16] = {0};
+    unsigned int numberOfElements = 0;
+
+    rewind(file);
+    while(fgets(str, 16, file)!=NULL)
+    {
+        numberOfElements += 1;
+    }
+    return numberOfElements;
 }
 
 
@@ -174,17 +186,40 @@ void cicFilter_filterData(unsigned int channel, unsigned int R, unsigned int N, 
     cicFilter_createFiles(newFilePath, channel);
     fileManager_getPathToFilter(oldFilePath, channel);
 
+    unsigned int endPoint = 1, startPoint = 11, size = 0, numberOfElements = 0;
+
     FILE* newFile, *oldFile;
     newFile = fopen(newFilePath, "w");
     oldFile = fopen(oldFilePath, "r");
+    numberOfElements = cicFilter_getNumberOfElements(oldFile);
     rewind(newFile);
     rewind(oldFile);
-    unsigned int endPoint = 20, startPoint = 1;
+    
+    while((endPoint * 1000)<numberOfElements)
+    {
+        if(ftell(oldFile) > 10 * (sizeof(double)+1))
+        {
+            fseek(oldFile, -10 * (sizeof(double)+1), SEEK_CUR);
+        }
+        cicFilter_loadData(oldFile, data, endPoint*1000, startPoint-10);
+        
+        size = cicFilter_allStages(data, R, N, M, endPoint*1000 - startPoint - 10 + 1);
+        
+        cicFilter_saveToFile(newFile, data, size);
 
-    cicFilter_loadData(oldFile, data, endPoint, startPoint);
+        startPoint = endPoint*1000 + 1;
+        endPoint += 1;
+        
+    }
+   
+    if(numberOfElements - startPoint > 1)
+    {
+        cicFilter_loadData(oldFile, data, numberOfElements, startPoint - 10);
 
-    cicFilter_allStages(data, R, N, M, endPoint - startPoint + 1);
+        size = cicFilter_allStages(data, R, N, M, numberOfElements - startPoint - 10);
 
+        cicFilter_saveToFile(newFile, data, size);
+    }
 
     fclose(newFile);
     fclose(oldFile);

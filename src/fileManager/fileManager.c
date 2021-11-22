@@ -117,14 +117,14 @@ static char* fileManager_getPath(char *const path,  bool raw, bool channel)
 static void fileManager_convertToVoltage(fileManager_Data_t* const container, char* const path)
 {
     long i = 0;
-    float temp = 0;
+    double temp = 0;
     FILE* file;
     file = fopen(path, "a");
 
     for (i=0;i<container->size;i++)
     {
         temp = container->data[i] * 1.8/4096;
-        fprintf(file,"%f\n" ,temp);
+        fprintf(file,"%lf\n" ,temp);
     }
 
     free(container->data);
