@@ -21,5 +21,6 @@ int fileManager_prepareNewFile(void);
 int fileManager_saveAsVoltage(void);
 char* fileManager_createFilterFile(char* const path, unsigned int channel);
 char* fileManager_getPathToFilter(char* const path, unsigned int channel);
+void fileManager_unmountDisk(void);
 
  #endif

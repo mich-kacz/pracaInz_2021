@@ -83,5 +83,7 @@ int main(void)
 
     cicFilter_filterData(1, 2, 5, 1);
 
+    fileManager_unmountDisk();
+
     return 0;
 }

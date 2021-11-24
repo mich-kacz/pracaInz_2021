@@ -243,3 +243,10 @@ char* fileManager_getPathToFilter(char* const path, unsigned int channel)
 
     return path;
 }
+
+
+void fileManager_unmountDisk()
+{
+   system("sudo umount /media/usb/");
+   
+}

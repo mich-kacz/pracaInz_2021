@@ -32,16 +32,16 @@ static unsigned int cicFilter_decimator(double *data, unsigned int R, unsigned i
 static void cicFilter_comb(double *data, unsigned int N, unsigned int M, unsigned int size);
 static void cicFilter_scale(double *data, unsigned int R, unsigned int N, unsigned int M, unsigned int size);
 static unsigned int cicFilter_allStages(double *data, unsigned int R, unsigned int N, unsigned int M, unsigned int len);
-static void cicFilter_saveToFile(FILE* file, double* data, unsigned int size);
+static void cicFilter_saveToFile(FILE* file, double* data, unsigned int size, unsigned int offset);
 
 
  static void cicFilter_createFiles(char* path, unsigned int channel)
  {
     fileManager_createFilterFile(path, channel);
 
-    FILE* file;
-    file = fopen(path, "w");
-    fclose(file);
+    //FILE* file;
+    //file = fopen(path, "w");
+    //fclose(file);
  }
 
 static void cicFilter_loadData(FILE* file, double* data, unsigned int endPoint, unsigned int startPoint)
@@ -142,6 +142,7 @@ static unsigned int cicFilter_allStages(double *data, unsigned int R, unsigned i
     
     unsigned int size = 0;
     size = cicFilter_decimator(data, R, len);
+   
 
     cicFilter_comb(data, N, M, size);
 
@@ -150,14 +151,13 @@ static unsigned int cicFilter_allStages(double *data, unsigned int R, unsigned i
     return size;
 }
 
-static void cicFilter_saveToFile(FILE* file, double* data, unsigned int size)
+static void cicFilter_saveToFile(FILE* file, double* data, unsigned int size, unsigned int offset)
 {
     unsigned int i = 0;
     
-    for (i=0;i<size;i++)
+    for (i=0;i<size - offset;i++)
     {
-        if(i>6)
-        fprintf(file,"%lf\n" ,data[i]);
+        fprintf(file,"%lf\n" , data[i + offset]);
     }
 }
 
@@ -186,7 +186,7 @@ void cicFilter_filterData(unsigned int channel, unsigned int R, unsigned int N, 
     cicFilter_createFiles(newFilePath, channel);
     fileManager_getPathToFilter(oldFilePath, channel);
 
-    unsigned int endPoint = 1, startPoint = 11, size = 0, numberOfElements = 0;
+    unsigned int endPoint = 1, startPoint = 1, size = 0, numberOfElements = 0;
 
     FILE* newFile, *oldFile;
     newFile = fopen(newFilePath, "w");
@@ -197,15 +197,23 @@ void cicFilter_filterData(unsigned int channel, unsigned int R, unsigned int N, 
     
     while((endPoint * 1000)<numberOfElements)
     {
-        if(ftell(oldFile) > 10 * (sizeof(double)+1))
+        if(ftell(oldFile) > 10 * (sizeof(double) + 1))
         {
-            fseek(oldFile, -10 * (sizeof(double)+1), SEEK_CUR);
+            fseek(oldFile, -10 * (sizeof(double) + 1), SEEK_CUR);
         }
-        cicFilter_loadData(oldFile, data, endPoint*1000, startPoint-10);
+        if(startPoint == 1)
+        {
+            cicFilter_loadData(oldFile, data, endPoint*1000, startPoint);
+             size = cicFilter_allStages(data, R, N, M, endPoint*1000 - startPoint + 1);
+             cicFilter_saveToFile(newFile, data, size, 0);
+        }
+        else
+        {
+            cicFilter_loadData(oldFile, data, endPoint*1000, startPoint-10);
+             size = cicFilter_allStages(data, R, N, M, endPoint*1000 - startPoint + 11);
+             cicFilter_saveToFile(newFile, data, size, 5);
+        }
         
-        size = cicFilter_allStages(data, R, N, M, endPoint*1000 - startPoint - 10 + 1);
-        
-        cicFilter_saveToFile(newFile, data, size);
 
         startPoint = endPoint*1000 + 1;
         endPoint += 1;
@@ -214,11 +222,16 @@ void cicFilter_filterData(unsigned int channel, unsigned int R, unsigned int N, 
    
     if(numberOfElements - startPoint > 1)
     {
+        if(ftell(oldFile) > 10 * (sizeof(double) + 1))
+        {
+            fseek(oldFile, -10 * (sizeof(double) + 1), SEEK_CUR);
+        }
+
         cicFilter_loadData(oldFile, data, numberOfElements, startPoint - 10);
 
-        size = cicFilter_allStages(data, R, N, M, numberOfElements - startPoint - 10);
+        size = cicFilter_allStages(data, R, N, M, numberOfElements - startPoint + 11);
 
-        cicFilter_saveToFile(newFile, data, size);
+        cicFilter_saveToFile(newFile, data, size, 5);
     }
 
     fclose(newFile);
