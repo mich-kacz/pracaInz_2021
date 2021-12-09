@@ -31,5 +31,8 @@
 #define BBB_buffer_enable "/sys/bus/iio/devices/iio:device0/buffer/enable"
 #define BBB_buffer_available "/sys/bus/iio/devices/iio:device0/buffer/data_available"
 #define BBB_buffer_data   "/dev/iio:device0"
+#define BBB_gpio45        "/sys/class/gpio/gpio45"
+#define BBB_gpio66        "/sys/class/gpio/gpio66"
+#define BBB_gpio69        "/sys/class/gpio/gpio69"
 
 #endif

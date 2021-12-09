@@ -169,6 +169,14 @@ static void fileManager_convertToVoltage(fileManager_Data_t* const container, ch
     {
         error = system("sudo mount /dev/sdd1 /media/usb/");
     }
+    if (error != 0) 
+    {
+        error = system("sudo mount /dev/mmcblk0p1 /media/usb/");
+    }
+    if (error != 0) 
+    {
+        error = system("sudo mount /dev/mmcblk1p1 /media/usb/");
+    }
     fileManager_getPath(path, true, false);
     
     while(access(path, F_OK)==0)
