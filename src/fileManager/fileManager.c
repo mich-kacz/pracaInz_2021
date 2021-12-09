@@ -23,6 +23,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "fileManager.h"
+
  /* Private Variables --------------------------------------------------------------- */
 static unsigned int fileNumber = 1;
 
@@ -64,7 +66,6 @@ static void fileManager_getData(fileManager_Data_t* const container, char* const
 
     fileManager_setFileSize(container, path);
     container->data = malloc(sizeof(uint16_t)*container->size);
-
     FILE* file;
     file = fopen(path, "r");
     rewind(file);
@@ -113,6 +114,23 @@ static char* fileManager_getPath(char *const path,  bool raw, bool channel)
     return path;
 }
 
+static void fileManager_convertToVoltage(fileManager_Data_t* const container, char* const path)
+{
+    long i = 0;
+    double temp = 0;
+    FILE* file;
+    file = fopen(path, "a");
+
+    for (i=0;i<container->size;i++)
+    {
+        temp = container->data[i] * 1.8/4096;
+        fprintf(file,"%lf\n" ,temp);
+    }
+
+    free(container->data);
+    fclose(file);
+}
+
 
  /* Exposed API --------------------------------------------------------------- */
 
@@ -143,6 +161,22 @@ static char* fileManager_getPath(char *const path,  bool raw, bool channel)
     {
         error = system("sudo mount /dev/sdb1 /media/usb/");
     }
+    if (error != 0)
+    {
+        error = system("sudo mount /dev/sdc1 /media/usb/");
+    }
+    if (error != 0)
+    {
+        error = system("sudo mount /dev/sdd1 /media/usb/");
+    }
+    if (error != 0) 
+    {
+        error = system("sudo mount /dev/mmcblk0p1 /media/usb/");
+    }
+    if (error != 0) 
+    {
+        error = system("sudo mount /dev/mmcblk1p1 /media/usb/");
+    }
     fileManager_getPath(path, true, false);
     
     while(access(path, F_OK)==0)
@@ -150,29 +184,9 @@ static char* fileManager_getPath(char *const path,  bool raw, bool channel)
         fileNumber++;
         fileManager_getPath(path, true, false);
     }
+
     return 0;
  }
-
-
-
-static void fileManager_convertToVoltage(fileManager_Data_t* const container, char* const path)
-{
-    long i = 0;
-    float temp = 0;
-    FILE* file;
-    file = fopen(path, "a");
-
-    for (i=0;i<container->size;i++)
-    {
-        temp = container->data[i] * 1.8/4096;
-        fprintf(file,"%f\n" ,temp);
-    }
-
-    free(container->data);
-    fclose(file);
-}
-
-
 
  int fileManager_saveAsVoltage(void) 
  {
@@ -200,3 +214,47 @@ static void fileManager_convertToVoltage(fileManager_Data_t* const container, ch
  }
 
 
+ char* fileManager_createFilterFile(char* const path, unsigned int channel)
+ {
+    char buff[7]={0};
+
+
+    strcpy(path, STD_PATH);
+
+    sprintf(buff,"%u" , fileNumber);
+    strcpy(path, strcat(path, buff));
+    strcpy(path, strcat(path, "_cicFilt_ch"));
+
+    memset(buff, 0, 7);
+    sprintf(buff,"%u" , channel);
+    strcpy(path, strcat(path, buff));
+
+    strcpy(path, strcat(path, ".txt"));
+
+    return path;
+ }
+
+char* fileManager_getPathToFilter(char* const path, unsigned int channel)
+{
+    switch(channel)
+    {
+        case 1:
+            fileManager_getPath(path,  false, false);
+            break;
+        case 2:
+            fileManager_getPath(path,  false, true);
+            break;
+        default:
+            fileManager_getPath(path,  false, false);
+            break;
+    }
+
+    return path;
+}
+
+
+void fileManager_unmountDisk()
+{
+   system("sudo umount /media/usb/");
+   
+}

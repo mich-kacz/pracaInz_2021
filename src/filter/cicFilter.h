@@ -9,15 +9,12 @@
 
  /* Includes --------------------------------------------------------------- */
 
-#include <stdint.h>
-
-#ifndef fileManager_H
-#define fileManager_H
+#ifndef cicFilter_H
+#define cicFilter_H
 
 /* Exposed API --------------------------------------------------------------- */
 
-int fileManager_saveRawData(uint16_t *buffer, unsigned int size);
-int fileManager_prepareNewFile(void);
-int fileManager_saveAsVoltage(void);
+void cicFilter_filterData(unsigned int channel, unsigned int R, unsigned int N, unsigned int M);
+
 
  #endif
