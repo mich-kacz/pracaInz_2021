@@ -12,11 +12,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "configurator/configurator.h"
 #include "acquisitor/acquisitor.h"
 #include "fileManager/fileManager.h"
 #include "filter/cicFilter.h"
+#include "gpio/gpioManager.h"
 
 /* Interrupt handler ------------------------------------------------------- */
 
@@ -46,30 +48,29 @@ int main(void)
 
     uint16_t buffer[BUFFER_LENGTH]={0};
     unsigned int samples = 0;
-    //unsigned int sum = 0;
-    //clock_t start = clock(), diff;
-    //int msec;
+   
+    gpioManager_configurePins();
+    
+   /* while(interrupt == false)
+    {
+        ledValue = gpioManager_readPin(66);
 
+
+        gpioManager_setPin(45, ledValue + 1);
+	usleep(500000);
+        gpioManager_setPin(45, samples);
+	usleep(500000);
+    }*/
+
+    
+    gpioManager_setPin(45, 1);
     acquisitor_begin();
 
     while (interrupt == false)
     {
     	samples = acquisitor_acquire(buffer, BUFFER_LENGTH);
         fileManager_saveRawData(buffer, samples);
-        //sum += samples;
         if(samples>8000){printf("%u\n", samples);}
-        
-        /*diff = clock() - start;
-        msec = diff * 1000 / CLOCKS_PER_SEC;
-
-        if(msec >= 10000)
-        {
-            samples = acquisitor_acquire(buffer, BUFFER_LENGTH);
-            fileManager_saveRawData(buffer, samples);
-            sum += samples;
-            printf("Time taken %d milliseconds, samples %u\n", msec, sum);
-            break;
-        }*/
     }
    
     acquisitor_end();
@@ -83,6 +84,7 @@ int main(void)
 
     cicFilter_filterData(1, 2, 5, 1);
 
+    gpioManager_setPin(45, 0);
     fileManager_unmountDisk();
 
     return 0;
