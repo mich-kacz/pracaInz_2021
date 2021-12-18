@@ -136,6 +136,6 @@ void gpioManager_configurePins(void)
     memset(path, 0, 64);
     strcpy(path, BBB_gpio66);
     file = fopen(strcat(path, "/active_low"), "w");
-    fprintf(file, "%d", 1);
+    fprintf(file, "%d", 0);
     fclose(file);
 }

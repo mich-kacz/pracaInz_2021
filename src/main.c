@@ -35,57 +35,64 @@ void interruptHandler(int signal)
 
 int main(void)
 {
+    uint16_t buffer[BUFFER_LENGTH]={0};
+    unsigned int samples = 0;
     int error = 0;
     signal(SIGINT, interruptHandler);
     
-    fileManager_prepareNewFile();
-    error = configurator_open(ADC_PORT, ADC_PORT2, BUFFER_LENGTH);
-
-    if (error != 0)
-    {
-        printf("ERROR: %s", strerror(error));
-    }
-
-    uint16_t buffer[BUFFER_LENGTH]={0};
-    unsigned int samples = 0;
-   
     gpioManager_configurePins();
-    
-   /* while(interrupt == false)
+	
+    for (int i=0; i<3;i++)
     {
-        ledValue = gpioManager_readPin(66);
-
-
-        gpioManager_setPin(45, ledValue + 1);
+	gpioManager_setPin(45, 1);
 	usleep(500000);
-        gpioManager_setPin(45, samples);
+	gpioManager_setPin(45, 0);
 	usleep(500000);
-    }*/
-
-    
-    gpioManager_setPin(45, 1);
-    acquisitor_begin();
-
-    while (interrupt == false)
-    {
-    	samples = acquisitor_acquire(buffer, BUFFER_LENGTH);
-        fileManager_saveRawData(buffer, samples);
-        if(samples>8000){printf("%u\n", samples);}
-    }
-   
-    acquisitor_end();
-    error = configurator_close(ADC_PORT, ADC_PORT2);
-    if (error != 0)
-    {
-        printf("ERROR: %s", strerror(error));
     }
 
-    fileManager_saveAsVoltage();
+    while(interrupt == false)
+    {
+	if(gpioManager_readPin(66) > 0)
+	{	
+            error = fileManager_prepareNewFile();
+	    if(error == 0)
+            	error = configurator_open(ADC_PORT, ADC_PORT2, BUFFER_LENGTH);
 
-    cicFilter_filterData(1, 2, 5, 1);
+            if (error != 0)
+            {
+                printf("Configuration error\n");
+		usleep(250000);
+            }else
+	    {
+		gpioManager_setPin(45, 1);
+                acquisitor_begin();
 
-    gpioManager_setPin(45, 0);
-    fileManager_unmountDisk();
+                while (gpioManager_readPin(66)>0)
+                {
+                    samples = acquisitor_acquire(buffer, BUFFER_LENGTH);
+                    fileManager_saveRawData(buffer, samples);
+                    if(samples>8000){printf("%u\n", samples);}
+                }
+               
+                acquisitor_end();
+                error = configurator_close(ADC_PORT, ADC_PORT2);
+                if (error != 0)
+                {
+                    printf("ERROR: %s", strerror(error));
+                }
 
+                fileManager_saveAsVoltage();
+
+                cicFilter_filterData(1, 2, 5, 1);
+
+                fileManager_unmountDisk();
+	    }
+	}else
+	{
+	    gpioManager_setPin(45, 0);
+	    usleep(125000);
+	}
+
+    }
     return 0;
 }
