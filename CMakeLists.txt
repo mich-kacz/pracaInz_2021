@@ -15,9 +15,12 @@ file(GLOB Configurator_src
 file(GLOB Filter_src
 	"src/filter/*.c")
 
+file(GLOB Gpio_src
+	"src/gpio/*.c")
+
 project(Acquisitor_project)
 add_compile_options(-Wall -Wpedantic -Werror)
-add_executable(Acquisitor ${Main_src} ${Acquisitor_src} ${FileManager_src} ${Configurator_src} ${Filter_src})
+add_executable(Acquisitor ${Main_src} ${Acquisitor_src} ${FileManager_src} ${Configurator_src} ${Filter_src} ${Gpio_src})
 
 target_include_directories(Acquisitor PRIVATE src)
 target_link_libraries(Acquisitor PRIVATE m)
