@@ -123,7 +123,7 @@ static void fileManager_convertToVoltage(fileManager_Data_t* const container, ch
 
     for (i=0;i<container->size;i++)
     {
-        temp = container->data[i] * 1.8/4096;
+        temp = container->data[i] * (1.8/4095)*2;
         fprintf(file,"%lf\n" ,temp);
     }
 

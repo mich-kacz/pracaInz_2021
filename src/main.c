@@ -84,6 +84,7 @@ int main(void)
                 fileManager_saveAsVoltage();
 
                 cicFilter_filterData(1, 2, 5, 1);
+                cicFilter_filterData(2, 2, 5, 1);
 
                 fileManager_unmountDisk();
 	    }
