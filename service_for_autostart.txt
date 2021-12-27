@@ -1,0 +1,10 @@
+[Unit]
+Description=Auto start acqusitor
+
+[Service]
+Type=simple
+ExecStart=/home/debian/pracaInz_2021/pracaInz_2021/build/Acquisitor
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
