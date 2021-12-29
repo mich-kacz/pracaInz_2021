@@ -103,13 +103,13 @@ static char* fileManager_getPath(char *const path,  bool raw, bool channel)
 
     if (channel == true && raw == false)
     {
-        strcpy(path, strcat(path, "_ch2"));
+        strcat(path, "_ch2");
     }else if(channel == false && raw == false)
     {
-        strcpy(path, strcat(path, "_ch1"));
+        strcat(path, "_ch1");
     }
 
-    strcpy(path, strcat(path, ".txt"));
+    strcat(path, ".txt");
 
     return path;
 }
@@ -222,14 +222,14 @@ static void fileManager_convertToVoltage(fileManager_Data_t* const container, ch
     strcpy(path, STD_PATH);
 
     sprintf(buff,"%u" , fileNumber);
-    strcpy(path, strcat(path, buff));
-    strcpy(path, strcat(path, "_cicFilt_ch"));
+    strcat(path, buff);
+    strcat(path, "_cicFilt_ch");
 
     memset(buff, 0, 7);
     sprintf(buff,"%u" , channel);
-    strcpy(path, strcat(path, buff));
+    strcat(path, buff);
 
-    strcpy(path, strcat(path, ".txt"));
+    strcat(path, ".txt");
 
     return path;
  }

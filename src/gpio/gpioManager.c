@@ -40,20 +40,20 @@
         case 69:
             strcpy(path, BBB_gpio69);
             file = fopen(strcat(path, "/value"), "w");
+	    fprintf(file, "%d", value);
+	    fclose(file);
             break;
 
         case 45:
             strcpy(path, BBB_gpio45);
             file = fopen(strcat(path, "/value"), "w");
+	    fprintf(file, "%d", value);
+	    fclose(file);
             break;
             
         default:
             break;
     }
-
-    fprintf(file, "%d", value);
-
-    fclose(file);
 }
 
 
@@ -70,27 +70,29 @@ int gpioManager_readPin(int pin)
             strcpy(path, BBB_gpio66);
             file = fopen(strcat(path, "/value"), "r");
             fread(&temp, 1, 1, file);
+	    sscanf(temp, "%d", &value);
+	    fclose(file);
             break;
 
         case 69:
             strcpy(path, BBB_gpio69);
             file = fopen(strcat(path, "/value"), "r");
-             fread(&temp, 1, 1, file);
+            fread(&temp, 1, 1, file);
+	    sscanf(temp, "%d", &value);
+	    fclose(file);
             break;
 
         case 45:
             strcpy(path, BBB_gpio45);
             file = fopen(strcat(path, "/value"), "r");
             fread(&temp, 1, 1, file);
+	    sscanf(temp, "%d", &value);
+	    fclose(file);
             break;
             
         default:
             break;
     }
-
-    sscanf(temp, "%d", &value);
-
-    fclose(file);
 
     return value;
 }
