@@ -1,3 +1,13 @@
+/**
+ ******************************************************************************
+ * @file    main.c
+ * @author  Michał Kaczmarczyk
+ * @date    2021-12-29
+ * @brief   File contains main loop of program.
+ * @copyright Copyright (c) 2021
+ ******************************************************************************
+ */
+
 
 /* Constants and macros --------------------------------------------------------------- */
 
@@ -21,10 +31,14 @@
 #include "gpio/gpioManager.h"
 
 /* Interrupt handler ------------------------------------------------------- */
-
 static _Atomic bool interrupt = false;
 
-
+/**
+ * @brief Method for catching interrupt ctrl-c signal. If signal is catched main loop 
+ * is terminated and program exits.
+ * 
+ * @param signal 
+ */
 void interruptHandler(int signal)
 {
     interrupt = true;
@@ -33,6 +47,11 @@ void interruptHandler(int signal)
 
 /* Main --------------------------------------------------------------- */
 
+/**
+ * @brief Program main loop.
+ * 
+ * @return int 
+ */
 int main(void)
 {
     uint16_t buffer[BUFFER_LENGTH]={0};

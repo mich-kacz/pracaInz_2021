@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file    configurator.h
+ * @file    acquisitor.c
  * @author  Michał Kaczmarczyk
- * @date    2021-08-22
- * @brief   <Provide some short description here>
+ * @date    2021-12-30
+ * 
  ******************************************************************************
  */
 
@@ -20,6 +20,11 @@
 #include "fileManager/BeagleBoneBlack.h"
 
 /* Private Variables --------------------------------------------------------------- */
+/**
+ * @brief Struct for file descriptor of file containing data from system's cyclic buffer with acquired ADC values.
+ * Second field in structure contains actual number of samples in cyclic buffer to read.
+ * 
+ */
 typedef struct Acquisitor_Files_Info_s
 {
     FILE *File;

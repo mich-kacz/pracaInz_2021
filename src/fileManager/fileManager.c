@@ -2,8 +2,8 @@
  ******************************************************************************
  * @file    fileManager.c
  * @author  Michał Kaczmarczyk
- * @date    2021-08-22
- * @brief   <Provide some short description here>
+ * @date    2021-12-29
+ * 
  ******************************************************************************
  */
 
@@ -28,6 +28,10 @@
  /* Private Variables --------------------------------------------------------------- */
 static unsigned int fileNumber = 1;
 
+/**
+ * @brief Struct with fields for number of samples in one channel and acquired data.
+ * 
+ */
 typedef struct fileManager_Data_s
 {
     uint16_t* data;

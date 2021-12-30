@@ -3,7 +3,7 @@
  * @file    gpioManager.c
  * @author  Michał Kaczmarczyk
  * @date    2021-08-22
- * @brief   <Provide some short description here>
+ *  
  ******************************************************************************
  */
 

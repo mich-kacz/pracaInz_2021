@@ -1,14 +1,13 @@
 /**
  ******************************************************************************
- * @file    fileManager.c
+ * @file    cicFilter.c
  * @author  Michał Kaczmarczyk
- * @date    2021-08-22
- * @brief   <Provide some short description here>
+ * @date    2021-12-29
+ *
  ******************************************************************************
  */
 
  /* Macros --------------------------------------------------------------- */
-
 #define FILE_NAME_LEN 64
 #define SIZE_OF_DATA 1024
 

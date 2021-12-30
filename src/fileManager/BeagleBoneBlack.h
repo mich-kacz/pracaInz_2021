@@ -2,8 +2,8 @@
  ******************************************************************************
  * @file    BeagleBoneBlack.h
  * @author  Michał Kaczmarczyk
- * @date    2021-08-22
- * @brief   <Provide some short description here>
+ * @date    2021-12-29
+ * @brief   Header file with paths to some files of BeagleBone Black system.
  ******************************************************************************
  */
 
